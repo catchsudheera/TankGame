@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources>
+	<!-- basedir -->
+	<basedir path="data/" />
+	<!-- sounds -->
+	<!-- songs -->
+	<!-- images -->
+	<image key="background" file="background/background.jpg" />
+	<image key="arena" 	file="arena/arena.png"/>
+	<image key="coin" 	file="arena/coin.png"/>
+	<image key="brick100" 	file="walls/brick_full.png"/>
+	<image key="brick75" 	file="walls/brick_75.png"/>
+	<image key="brick50" 	file="walls/brick_50.png"/>
+	<image key="brick25" 	file="walls/brick_25.png"/>
+	<image key="brick0" 	file="walls/brick_0.png"/>
+	<image key="stone" 	file="walls/stone.png"/>
+	<image key="water" 	file="water/water.png"/>
+	<image key="lifepack" 	file="lifepacks/lifepack.png"/>
+	<image key="opponent_up" 	file="players/opponent_up.png"/>
+	<image key="opponent_down" 	file="players/opponent_down.png"/>
+	<image key="opponent_left" 	file="players/opponent_left.png"/>
+	<image key="opponent_right" 	file="players/opponent_right.png"/>
+	<image key="me_up" 	file="players/me_up.png"/>
+	<image key="me_down" 	file="players/me_down.png"/>
+	<image key="me_left" 	file="players/me_left.png"/>
+	<image key="me_right" 	file="players/me_right.png"/>
+	
+	<!-- sheets -->
+	<!-- fonts -->
+</resources>
