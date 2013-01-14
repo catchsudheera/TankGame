@@ -9,10 +9,7 @@ import it.randomtower.engine.entity.Entity;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.newdawn.slick.GameContainer;
-import org.newdawn.slick.Graphics;
-import org.newdawn.slick.Image;
-import org.newdawn.slick.SlickException;
+import org.newdawn.slick.*;
 import org.newdawn.slick.state.StateBasedGame;
 
 /**
@@ -27,7 +24,8 @@ class GameWorld extends World {
     private Communicator com;
     private int playerInitX, playerInitY; // this variables declares the initial position of the player
     private Player[] opponentPlayer = new Player[4];
-    private Player player ;
+    private Player player;
+    private boolean playersCreated = false;
 
     public GameWorld(int id, GameContainer gc) {
         super(id, gc);
@@ -47,7 +45,7 @@ class GameWorld extends World {
         }
 
         String reciveData;
-        
+
         com.sendData(config.C2S_INITIALREQUEST);
         reciveData = com.reciveData();
 
@@ -179,11 +177,6 @@ class GameWorld extends World {
         String reciveData = com.reciveData();
         String[] section = reciveData.split(":");
 
-//        for (int i = 0; i < section.length; i++) {
-//            System.out.println("section " + i + " : " + section[i]);
-//        }
-
-
         if (section[0].equals("C")) {
             setCoins(section);
         } else if (section[0].equals("L")) {
@@ -194,6 +187,7 @@ class GameWorld extends World {
 
         } else if (section[0].equals("S")) {
             setOtherplayers(reciveData.split(":"));
+            playersCreated=true;
         }
 
     }
@@ -202,10 +196,13 @@ class GameWorld extends World {
     public void render(GameContainer gc, StateBasedGame game, Graphics g) throws SlickException {
 
 
+        //render background
         g.drawImage(background, 0, -130);
         g.drawImage(arenaImage, 20, 20);
         super.render(gc, game, g);
 
+        //render Points table
+        setPointsTable(g);
 
     }
 
@@ -221,7 +218,7 @@ class GameWorld extends World {
 
         arena[x][y] = new Coin(arena[x][y].getPosX(), arena[x][y].getPosY(), value, lifetime);
         add(arena[x][y]);
-        System.out.println("C: " + x + " -> " + arena[x][y].getPosX() + " " + y + "->" + arena[x][y].getPosY() + " " + "value = " + value);
+        System.out.println("C: " + x + "," + y +" " + "value = " + value);
 
     }
 
@@ -238,7 +235,7 @@ class GameWorld extends World {
         arena[x][y] = new LifePack(arena[x][y].getPosX(), arena[x][y].getPosY(), lifetime);
         add(arena[x][y]);
 
-        System.out.println("L: " + x + " -> " + arena[x][y].getPosX() + " " + y + "->" + arena[x][y].getPosY() + " " + "life = " + lifetime);
+        System.out.println("L: " + x + ","+ y +"  " + "life = " + lifetime);
     }
 
     private void createBackground() {
@@ -286,9 +283,32 @@ class GameWorld extends World {
         playerInitX = x;
         playerInitY = y;
     }
-    
-    private void setPointsTable(){
+
+    private void setPointsTable(Graphics g) {
+
+        String spaceBetColumns = config.pointTableColumnSpacing;
+        int spaceBetRows = config.pointTableRowSpacing;
+        int textPositionX = config.textPositionX;
+        int textPositionY = config.textPositionY;
+
+        g.setLineWidth(g.getLineWidth() * 3);
+        g.setColor(Color.yellow);
+        g.drawString(String.format("%10s", "Player ID") + spaceBetColumns + String.format("%10s", "Points") + spaceBetColumns + String.format("%10s", "Coins") + spaceBetColumns + String.format("%10s", "Helth"), textPositionX, textPositionY);
         
+//        g.drawString("65666  626  5615 5665 65156",  textPositionX, (textPositionX + 2 + 1) * spaceBetRows);
+        if (playersCreated) {
+            
+            for (int i = 0; i < 4; i++) {
+                String pointsTableEntry = opponentPlayer[i].getPointsTableEntry();
+                
+                g.drawString(pointsTableEntry, textPositionX, textPositionY+spaceBetRows*(i+1));
+               
+          
+                
+                
+            }
+
+        }
     }
 
     private void setOtherplayers(String[] playerSection) {
@@ -312,11 +332,10 @@ class GameWorld extends World {
 
             opponentPlayer[i] = new Player(arena[x][y].getPosX(), arena[x][y].getPosY(), true, no, direction);
             add(opponentPlayer[i]);
-           // opponentPlayer[i] = (Player) arena[x][y];
-
-
+            // opponentPlayer[i] = (Player) arena[x][y];
 
         }
+        
     }
 
     private void updatePlayers(String[] section) {
@@ -324,6 +343,9 @@ class GameWorld extends World {
         for (int i = 0; i < 5; i++) {
 
             if (i == 4) {
+                
+                //update the AI player code goes here
+                //not yet implemented
                 continue;
             }
             opponentPlayer[i].setGlobleUpdate(section[i + 1]);

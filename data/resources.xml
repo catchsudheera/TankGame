@@ -6,7 +6,7 @@
 	<!-- songs -->
 	<!-- images -->
 	
-	background_with_point_table
+	
 	<image key="background" file="background/background.jpg" />
 	<image key="background_with_pt" file="background/background_with_point_table.jpg" />
 	<image key="arena" 	file="arena/arena.png"/>
@@ -27,6 +27,8 @@
 	<image key="me_down" 	file="players/me_down.png"/>
 	<image key="me_left" 	file="players/me_left.png"/>
 	<image key="me_right" 	file="players/me_right.png"/>
+	<image key="test" 	file="test/test.png"/>
+	
 	
 	<!-- sheets -->
 	<!-- fonts -->

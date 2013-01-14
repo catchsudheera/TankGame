@@ -2,6 +2,7 @@ package entities;
 
 import it.randomtower.engine.ME;
 import it.randomtower.engine.ResourceManager;
+import it.randomtower.engine.entity.Entity;
 import org.newdawn.slick.*;
 
 /**
@@ -27,13 +28,18 @@ public class Coin extends Cell {
         this.life = life;
         this.x = super.x;
         this.y = super.y;
-        depth = 5;
+        this.depth = 5;
         coin = ResourceManager.getImage("coin");
         setGraphic(coin);
         setHitBox(0, 0, coin.getWidth(), coin.getHeight());
         addType(COIN);
-
+   
     }
+
+    public int getValue() {
+        return value;
+    }
+    
 
     @Override
     public void render(GameContainer container, Graphics g) throws SlickException {
@@ -48,24 +54,21 @@ public class Coin extends Cell {
     @Override
     public void update(GameContainer container, int delta) throws SlickException {
         super.update(container, delta);
-
-
+        
         timelived += delta;
-        if (timelived >= life || isCollide()) {
+        if (timelived >= life ) {
             ME.world.remove(this);
         }    
         
     }
-    private boolean isCollide() {
-       
-        Player collidePlayer = (Player) collide(Player.PLAYERTYPE, x, y);
-       
-        if(collidePlayer!=null){
-            //code for adding coins
-            
-            collidePlayer.addCoins(this.value);
-            return true;
-        }
-        return false;          
+
+    @Override
+    public void collisionResponse(Entity other) {
+        
+        ME.world.remove(this);
+        System.out.println("removed : "+(x-configuration.config.startX)/configuration.config.gap+","+(y-configuration.config.startX)/configuration.config.gap);
+        
+        
     }
+    
 }

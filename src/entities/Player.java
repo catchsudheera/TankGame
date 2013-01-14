@@ -2,7 +2,9 @@ package entities;
 
 import configuration.config;
 import it.randomtower.engine.ResourceManager;
-import org.newdawn.slick.*;
+import org.newdawn.slick.GameContainer;
+import org.newdawn.slick.Image;
+import org.newdawn.slick.SlickException;
 
 /**
  *
@@ -20,6 +22,29 @@ public class Player extends Cell {
     private int coins = 0;
     private int points = 0;
     boolean isShot = false;
+
+    public Player(float x, float y, boolean opponent, int playerNo, int direction) {
+       
+        super(x, y);
+        
+          
+        this.opponent = opponent;
+        this.playerNo = playerNo;
+        this.direction = direction;
+        this.depth = 10;
+        this.opponent = opponent;
+
+        if (opponent) {
+            playerImage = ResourceManager.getImage("opponent_up");
+        } else {
+            playerImage = ResourceManager.getImage("me_up");
+        }
+        setGraphic(playerImage);
+        setHitBox(0, 0, playerImage.getWidth(), playerImage.getHeight());
+        addType(PLAYERTYPE);
+
+        globleUpdate = "P" + playerNo + ";" + (int) x + "," + (int) y + ";" + direction + ";0;" + helth + ";" + coins + ";" + points;
+    }
 
     public void deductCoins(int amount) {
         this.coins -= amount;
@@ -43,67 +68,16 @@ public class Player extends Cell {
         this.setDirection(direction);
     }
 
-    public Player(float x, float y, boolean opponent, int playerNo, int direction) {
-        super(x, y);
-        this.opponent = opponent;
-        this.playerNo = playerNo;
-        this.direction = direction;
-        this.depth = 10;
-        this.opponent = opponent;
-
-        if (opponent) {
-            playerImage = ResourceManager.getImage("opponent_up");
-        } else {
-            playerImage = ResourceManager.getImage("me_up");
-        }
-        setGraphic(playerImage);
-        setHitBox(x, y, playerImage.getWidth(), playerImage.getHeight());
-        addType(PLAYERTYPE);
-
-        globleUpdate = "P" + playerNo + ";" + (int) x + "," + (int) y + ";" + direction + ";0;" + helth + ";" + coins + ";" + points;
-    }
-
     @Override
     public void update(GameContainer container, int delta) throws SlickException {
         super.update(container, delta);
 
-
-        String[] data = globleUpdate.split(";");
-        String[] positionUpdate = data[1].split(",");
-        x = config.startX + config.gap * Integer.parseInt(positionUpdate[0]);
-        y = config.startY + config.gap * Integer.parseInt(positionUpdate[1]);
-        this.setDirection(Integer.parseInt(data[2]));
-        int shot = Integer.parseInt(data[3]);
-        if (shot == 1) {
-            isShot = true;
-        }
-        helth = Integer.parseInt(data[4]);
-        coins = Integer.parseInt(data[5]);
-        points = Integer.parseInt(data[6]);
-
-        renderDirection(direction);
+        collisionHandle();
+        globleUpdate();
+        playerImageDirection(direction);
     }
 
-    @Override
-    public void render(GameContainer container, Graphics g) throws SlickException {
-        super.render(container, g);
-
-        String spacing = config.pointTableSpacing;
-        int textPositionX = config.textPositionX;
-        int textPositionY = config.textPositionY;
-
-        g.setLineWidth(g.getLineWidth() * 3);
-
-        g.setColor(Color.yellow);
-        if (playerNo == 0) {
-            g.drawString(String.format("%10s", "Player ID") + spacing + String.format("%10s", "Points") + spacing + String.format("%10s", "Coins") + spacing + String.format("%10s", "Helth"), textPositionX, textPositionY);
-        }
-
-        g.drawString(String.format("%10s", playerNo) + spacing + String.format("%10s", points) + spacing + String.format("%10s", coins) + spacing + String.format("%10s", helth + "%"), textPositionX, textPositionY + (playerNo + 1) * 50);
-
-    }
-
-    private void renderDirection(int direction) {
+    private void playerImageDirection(int direction) {
         switch (direction) {
             case 0:
                 if (opponent) {
@@ -137,6 +111,34 @@ public class Player extends Cell {
                 }
                 setGraphic(playerImage);
                 break;
+        }
+    }
+
+    public String getPointsTableEntry() {
+        String spacing = config.pointTableColumnSpacing;
+        return String.format("%10s", playerNo) + spacing + String.format("%10s", points) + spacing + String.format("%10s", coins) + spacing + String.format("%10s", helth + "%");
+    }
+
+    private void globleUpdate() {
+
+        String[] data = globleUpdate.split(";");
+        String[] positionUpdate = data[1].split(",");
+        x = config.startX + config.gap * Integer.parseInt(positionUpdate[0]);
+        y = config.startY + config.gap * Integer.parseInt(positionUpdate[1]);
+        this.setDirection(Integer.parseInt(data[2]));
+        int shot = Integer.parseInt(data[3]);
+        if (shot == 1) {
+            isShot = true;
+        }
+        //   helth = Integer.parseInt(data[4]);
+        //   coins = Integer.parseInt(data[5]);
+        //  points = Integer.parseInt(data[6]);
+    }
+
+    private void collisionHandle() {
+        Coin collectedCoin = (Coin) collide(Coin.COIN, x, y);
+        if (collectedCoin != null) {
+            addCoins(collectedCoin.getValue());
         }
     }
 }

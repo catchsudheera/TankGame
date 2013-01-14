@@ -29,11 +29,13 @@ public class config {
 //        public static int MAP_SIZE =;
 //        public static int MAX_BRICKS =;
 //        public static int MAX_OBSTACLES = ;
-    public static String pointTableSpacing;
+    public static String pointTableColumnSpacing;
+    public static int pointTableRowSpacing;
     public static int textPositionX;
     public static int textPositionY;
 
     public static void loadData() throws FileNotFoundException, IOException {
+       
         Properties props = new Properties();
         FileInputStream fis = new FileInputStream("configuration/config_data.properties");
 
@@ -60,10 +62,11 @@ public class config {
         GRIDSIZE = Integer.parseInt(props.getProperty("GRIDSIZE"));
 
         //Point table
-        int len = Integer.parseInt(props.getProperty("point_table_spacing"));
+        int len = Integer.parseInt(props.getProperty("point_table_spacing_column"));
         char[] charArray = new char[len];
         Arrays.fill(charArray, ' ');
-        pointTableSpacing = new String(charArray);
+        pointTableColumnSpacing = new String(charArray);
+        pointTableRowSpacing = Integer.parseInt(props.getProperty("point_table_spacing_row"));
         textPositionX = Integer.parseInt(props.getProperty("textPositionX"));
         textPositionY = Integer.parseInt(props.getProperty("textPositionY"));
 
