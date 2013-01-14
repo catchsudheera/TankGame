@@ -27,6 +27,7 @@ class GameWorld extends World {
     private Communicator com;
     private int playerInitX, playerInitY; // this variables declares the initial position of the player
     private Player[] opponentPlayer = new Player[4];
+    private Player player ;
 
     public GameWorld(int id, GameContainer gc) {
         super(id, gc);
@@ -46,8 +47,7 @@ class GameWorld extends World {
         }
 
         String reciveData;
-
-
+        
         com.sendData(config.C2S_INITIALREQUEST);
         reciveData = com.reciveData();
 
@@ -76,7 +76,6 @@ class GameWorld extends World {
     }
 
     private void setBricks(String[] brick) {
-
         int[][] brickXY = new int[2][brick.length];
 
 
@@ -243,7 +242,7 @@ class GameWorld extends World {
     }
 
     private void createBackground() {
-        background = ResourceManager.getImage("background");
+        background = ResourceManager.getImage("background_with_pt");
 
         Entity back = new Entity(0, -130, background) {
         };
@@ -281,11 +280,15 @@ class GameWorld extends World {
         }
 
         // System.out.println(x + " " + y + "grid");
-        arena[x][y] = new Player(arena[x][y].getPosX(), arena[x][y].getPosY(), false, playerNo, 0);
-        add(arena[x][y]);
+        player = new Player(arena[x][y].getPosX(), arena[x][y].getPosY(), false, playerNo, 0);
+        add(player);
 
         playerInitX = x;
         playerInitY = y;
+    }
+    
+    private void setPointsTable(){
+        
     }
 
     private void setOtherplayers(String[] playerSection) {
@@ -307,9 +310,9 @@ class GameWorld extends World {
             }
             direction = Integer.parseInt(data[2]);
 
-            arena[x][y] = new Player(arena[x][y].getPosX(), arena[x][y].getPosY(), true, no, direction);
-            add(arena[x][y]);
-            opponentPlayer[i] = (Player) arena[x][y];
+            opponentPlayer[i] = new Player(arena[x][y].getPosX(), arena[x][y].getPosY(), true, no, direction);
+            add(opponentPlayer[i]);
+           // opponentPlayer[i] = (Player) arena[x][y];
 
 
 

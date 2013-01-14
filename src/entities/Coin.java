@@ -27,7 +27,7 @@ public class Coin extends Cell {
         this.life = life;
         this.x = super.x;
         this.y = super.y;
-        depth = 10;
+        depth = 5;
         coin = ResourceManager.getImage("coin");
         setGraphic(coin);
         setHitBox(0, 0, coin.getWidth(), coin.getHeight());
@@ -51,12 +51,21 @@ public class Coin extends Cell {
 
 
         timelived += delta;
-        if (timelived >= life) {
-
+        if (timelived >= life || isCollide()) {
             ME.world.remove(this);
-
-           
+        }    
+        
+    }
+    private boolean isCollide() {
+       
+        Player collidePlayer = (Player) collide(Player.PLAYERTYPE, x, y);
+       
+        if(collidePlayer!=null){
+            //code for adding coins
+            
+            collidePlayer.addCoins(this.value);
+            return true;
         }
-
+        return false;          
     }
 }

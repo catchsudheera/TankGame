@@ -3,6 +3,7 @@ package configuration;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Properties;
 
 /**
@@ -28,6 +29,9 @@ public class config {
 //        public static int MAP_SIZE =;
 //        public static int MAX_BRICKS =;
 //        public static int MAX_OBSTACLES = ;
+    public static String pointTableSpacing;
+    public static int textPositionX;
+    public static int textPositionY;
 
     public static void loadData() throws FileNotFoundException, IOException {
         Properties props = new Properties();
@@ -35,7 +39,7 @@ public class config {
 
         //loading properites from properties file
         props.load(fis);
-        
+
         //Communication
         C2S_INITIALREQUEST = props.getProperty("C2S_INITIALREQUEST");
         UP = props.getProperty("UP");
@@ -47,13 +51,22 @@ public class config {
         SERVER_PORT = Integer.parseInt(props.getProperty("SERVER_PORT"));
         CLIENT_PORT = Integer.parseInt(props.getProperty("CLIENT_PORT"));
         //C2S_INITIALREQUEST = props.getProperty("C2S_INITIALREQUEST");
-       
+
 
         //Map 
         gap = Integer.parseInt(props.getProperty("gap"));
         startX = Integer.parseInt(props.getProperty("startX"));
         startY = Integer.parseInt(props.getProperty("startY"));
         GRIDSIZE = Integer.parseInt(props.getProperty("GRIDSIZE"));
+
+        //Point table
+        int len = Integer.parseInt(props.getProperty("point_table_spacing"));
+        char[] charArray = new char[len];
+        Arrays.fill(charArray, ' ');
+        pointTableSpacing = new String(charArray);
+        textPositionX = Integer.parseInt(props.getProperty("textPositionX"));
+        textPositionY = Integer.parseInt(props.getProperty("textPositionY"));
+
 
 
 

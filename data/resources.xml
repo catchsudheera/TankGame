@@ -5,7 +5,10 @@
 	<!-- sounds -->
 	<!-- songs -->
 	<!-- images -->
+	
+	background_with_point_table
 	<image key="background" file="background/background.jpg" />
+	<image key="background_with_pt" file="background/background_with_point_table.jpg" />
 	<image key="arena" 	file="arena/arena.png"/>
 	<image key="coin" 	file="arena/coin.png"/>
 	<image key="brick100" 	file="walls/brick_full.png"/>
