@@ -77,7 +77,7 @@ public class Communicator {
 
                 this.reciveData();
             }
-            return readLine;
+            return readLine.split("#")[0];
         }
     }
 

@@ -7,6 +7,7 @@ import it.randomtower.engine.ResourceManager;
 import it.randomtower.engine.World;
 import it.randomtower.engine.entity.Entity;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.newdawn.slick.*;
@@ -22,10 +23,8 @@ class GameWorld extends World {
     private Image background, arenaImage;
     static public Cell[][] arena;
     private Communicator com;
-    private int playerInitX, playerInitY; // this variables declares the initial position of the player
-    private Player[] opponentPlayer = new Player[4];
-    private Player player;
-    private boolean playersCreated = false;
+    private ArrayList<Player> players = new ArrayList<>();
+    private int AIplayerNo;
 
     public GameWorld(int id, GameContainer gc) {
         super(id, gc);
@@ -33,117 +32,83 @@ class GameWorld extends World {
 
     private void setup(StateBasedGame game) throws IOException {
 
+        //get instance of communicator class
         com = Communicator.GetInstance();
 
         arena = new Cell[GRIDSIZE][GRIDSIZE];
-        for (int i = 0; i < GRIDSIZE; i++) {
-            for (int j = 0; j < GRIDSIZE; j++) {
-                arena[i][j] = new Cell(config.startX + config.gap * i, config.startY + config.gap * j);
-//                arena[i][j] = new Coin(arena[i][j].getPosX(), arena[i][j].getPosY());
-//                this.add(arena[i][j]);
-            }
-        }
+        //create the arena
+        createArena();
 
         String reciveData;
-
         com.sendData(config.C2S_INITIALREQUEST);
-        reciveData = com.reciveData();
+        do {
 
-//        System.out.println(reciveData+"*****");
+            reciveData = com.reciveData();
 
+            if (reciveData.equals("PLAYERS_FULL")) {
+                //exit the game to a window which states the situation
+                System.out.println("PLAYERS_FULL or GAME_ALREADY_STARTED");
+                System.exit(0);
+            }
+            if ((!reciveData.equals("ALREADY_ADDED")) && (!(reciveData.charAt(0) == 'I')) && ((!reciveData.equals("GAME_ALREADY_STARTED")))) {
+                com.sendData(config.C2S_INITIALREQUEST);
+            }
+
+        } while (!(reciveData.charAt(0) == 'I'));
+
+        // System.out.println("@@@@@"+reciveData);
         //I:P4:8,4;7,6;9,3;1,3;3,2;2,1;4,8;6,8;2,4;4,7:6,3;3,1;5,3;7,2;0,4;8,6;0,8;2,3;7,1;7,8:8,3;3,6;1,4;9,8;4,3;8,1;6,7;4,2;5,7;3,8#
         //S:P0;0,0;0:P1;0,9;0:P2;9,0;0:P3;9,9;0:P4;5,5;0#
 
-        String[] section = reciveData.split(":");
-        //set player me
-        setPlayer(section[1]);
-//        System.out.println("player sec : "+section[1]);
 
-        //set bricks
-        setBricks(section[2].split(";"));
-//         System.out.println("brick sec : "+section[2]);
+        String[] section = reciveData.split(":");  //break into sections
+        AIplayerNo = Integer.parseInt(section[1].charAt(1) + "");   //set AIplayer number 
+        setBricks(section[2].split(";")); //set bricks
+        setStones(section[3].split(";")); //set stones
+        setWater(section[4].split(";"));  //set water
 
-        //set stones
-        setStones(section[3].split(";"));
-//         System.out.println("stone sec : "+section[3]);
+        do {
+            reciveData = com.reciveData();
+        } while (!(reciveData.charAt(0) == 'S'));
 
-        //set water
-        setWater(section[4].split(";"));
-//         System.out.println("water sec : "+section[4]);
+        setPlayers(reciveData.split(":")); //set players from the initiation message
 
     }
 
     private void setBricks(String[] brick) {
-        int[][] brickXY = new int[2][brick.length];
-
 
         for (int i = 0; i < brick.length; i++) {
             String[] coordinates = brick[i].split(",");
-            brickXY[0][i] = Integer.parseInt(coordinates[0]);
-            brickXY[1][i] = Integer.parseInt(coordinates[1]);
+            int x = Integer.parseInt(coordinates[0]);
+            int y = Integer.parseInt(coordinates[1]);
 
-        }
-
-        for (int i = 0; i < brickXY[0].length; i++) {
-
-            int x = brickXY[0][i];
-            int y = brickXY[1][i];
             arena[x][y] = new Brick(arena[x][y].getPosX(), arena[x][y].getPosY());
             add(arena[x][y]);
         }
-
-
     }
 
     private void setStones(String[] stone) {
 
-        int[][] stoneXY = new int[2][stone.length];
-
-
         for (int i = 0; i < stone.length; i++) {
             String[] coordinates = stone[i].split(",");
-            stoneXY[0][i] = Integer.parseInt(coordinates[0]);
-            stoneXY[1][i] = Integer.parseInt(coordinates[1]);
-
-        }
-
-        for (int i = 0; i < stoneXY[0].length; i++) {
-
-            int x = stoneXY[0][i];
-            int y = stoneXY[1][i];
+            int x = Integer.parseInt(coordinates[0]);
+            int y = Integer.parseInt(coordinates[1]);
             arena[x][y] = new Stone(arena[x][y].getPosX(), arena[x][y].getPosY());
             add(arena[x][y]);
         }
-
 
     }
 
     private void setWater(String[] water) {
 
-        int[][] waterXY = new int[2][water.length];
-
-
         for (int i = 0; i < water.length; i++) {
+
             String[] coordinates = water[i].split(",");
-            waterXY[0][i] = Integer.parseInt(coordinates[0]);
-            if (i == water.length - 1) {
-                String[] split = coordinates[1].split("#");
-                coordinates[1] = split[0];
-            }
-            waterXY[1][i] = Integer.parseInt(coordinates[1]);
-
-
-        }
-        //   System.out.println("XXX water value "+ waterXY[1][water.length-1]  );
-
-        for (int i = 0; i < waterXY[0].length; i++) {
-
-            int x = waterXY[0][i];
-            int y = waterXY[1][i];
+            int x = Integer.parseInt(coordinates[0]);
+            int y = Integer.parseInt(coordinates[1]);
             arena[x][y] = new Water(arena[x][y].getPosX(), arena[x][y].getPosY());
             add(arena[x][y]);
         }
-
     }
 
     @Override
@@ -160,6 +125,7 @@ class GameWorld extends World {
             setup(game);
         } catch (IOException ex) {
             Logger.getLogger(GameWorld.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.println("IOException @setup()" + ex.toString());
         }
 
     }
@@ -175,6 +141,7 @@ class GameWorld extends World {
         super.update(gc, game, delta);
 
         String reciveData = com.reciveData();
+        //  System.out.println("#####"+reciveData);
         String[] section = reciveData.split(":");
 
         if (section[0].equals("C")) {
@@ -182,13 +149,9 @@ class GameWorld extends World {
         } else if (section[0].equals("L")) {
             setLifePacks(section);
         } else if (section[0].equals("G")) {
-
             updatePlayers(section);
-
-        } else if (section[0].equals("S")) {
-            setOtherplayers(reciveData.split(":"));
-            playersCreated=true;
         }
+
 
     }
 
@@ -212,13 +175,11 @@ class GameWorld extends World {
         int x = Integer.parseInt(coord[0]);
         int y = Integer.parseInt(coord[1]);
         int lifetime = Integer.parseInt(section[2]);
-        String[] split = section[3].split("#");
-        int value = Integer.parseInt(split[0]);
-
+        int value = Integer.parseInt(section[3]);
 
         arena[x][y] = new Coin(arena[x][y].getPosX(), arena[x][y].getPosY(), value, lifetime);
         add(arena[x][y]);
-        System.out.println("C: " + x + "," + y +" " + "value = " + value);
+        System.out.println("C: " + x + "," + y + " " + "value = " + value);
 
     }
 
@@ -227,15 +188,12 @@ class GameWorld extends World {
         String[] coord = section[1].split(",");
         int x = Integer.parseInt(coord[0]);
         int y = Integer.parseInt(coord[1]);
-        String[] split = section[2].split("#");
-        int lifetime = Integer.parseInt(split[0]);
-
-
+        int lifetime = Integer.parseInt(section[2]);
 
         arena[x][y] = new LifePack(arena[x][y].getPosX(), arena[x][y].getPosY(), lifetime);
         add(arena[x][y]);
 
-        System.out.println("L: " + x + ","+ y +"  " + "life = " + lifetime);
+        System.out.println("L: " + x + "," + y + "  " + "life = " + lifetime);
     }
 
     private void createBackground() {
@@ -277,11 +235,11 @@ class GameWorld extends World {
         }
 
         // System.out.println(x + " " + y + "grid");
-        player = new Player(arena[x][y].getPosX(), arena[x][y].getPosY(), false, playerNo, 0);
-        add(player);
+        // System.out.println("-");
+        // new Player(arena[x][y].getPosX(), arena[x][y].getPosY(), false, playerNo, 0);
+        //System.out.println("+");
+        //   add(player);
 
-        playerInitX = x;
-        playerInitY = y;
     }
 
     private void setPointsTable(Graphics g) {
@@ -294,62 +252,68 @@ class GameWorld extends World {
         g.setLineWidth(g.getLineWidth() * 3);
         g.setColor(Color.yellow);
         g.drawString(String.format("%10s", "Player ID") + spaceBetColumns + String.format("%10s", "Points") + spaceBetColumns + String.format("%10s", "Coins") + spaceBetColumns + String.format("%10s", "Helth"), textPositionX, textPositionY);
-        
-//        g.drawString("65666  626  5615 5665 65156",  textPositionX, (textPositionX + 2 + 1) * spaceBetRows);
-        if (playersCreated) {
-            
-            for (int i = 0; i < 4; i++) {
-                String pointsTableEntry = opponentPlayer[i].getPointsTableEntry();
-                
-                g.drawString(pointsTableEntry, textPositionX, textPositionY+spaceBetRows*(i+1));
-               
-          
-                
-                
-            }
+
+
+
+        for (int i = 0; i < players.size(); i++) {
+            String pointsTableEntry = players.get(i).getPointsTableEntry();
+            g.drawString(pointsTableEntry, textPositionX, textPositionY + spaceBetRows * (i + 1));
 
         }
+
+
     }
 
-    private void setOtherplayers(String[] playerSection) {
+    private void setPlayers(String[] playerSection) {
 
-        for (int i = 0; i < 4; i++) {
+        for (int i = 0; i < 5; i++) {
+
             int x, y, direction, no;
             String[] data = playerSection[i + 1].split(";");
             no = Integer.parseInt(data[0].charAt(1) + "");
             String[] position = data[1].split(",");
             x = Integer.parseInt(position[0]);
             y = Integer.parseInt(position[1]);
-
-            if (playerInitX == x && playerInitY == y) {
-                continue;
-            }
-
-            if (data[2].endsWith("#")) {
-                data[2] = data[2].split("#")[0];
-            }
             direction = Integer.parseInt(data[2]);
+            Player newPlayer;
 
-            opponentPlayer[i] = new Player(arena[x][y].getPosX(), arena[x][y].getPosY(), true, no, direction);
-            add(opponentPlayer[i]);
-            // opponentPlayer[i] = (Player) arena[x][y];
+            if (no == AIplayerNo) {
+                newPlayer = new AIPlayer(arena[x][y].getPosX(), arena[x][y].getPosY(), no, direction);
+            } else {
+                newPlayer = new Player(arena[x][y].getPosX(), arena[x][y].getPosY(), no, direction);
+            }
 
+            add(newPlayer);
+            players.add(newPlayer);
         }
-        
+
     }
 
     private void updatePlayers(String[] section) {
 
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < players.size(); i++) {
+            Player get = players.get(i);
+            int playerNo = get.getPlayerNo();
 
-            if (i == 4) {
-                
+            if (playerNo == AIplayerNo) {
                 //update the AI player code goes here
                 //not yet implemented
-                continue;
+                //continue;
+               AIPlayer AIget = (AIPlayer) players.get(i);
+               AIget.moveRight();
+            } else {
+                get.setGlobleUpdate(section[i + 1]);
             }
-            opponentPlayer[i].setGlobleUpdate(section[i + 1]);
         }
 
+    }
+
+    private void createArena() {
+
+        for (int i = 0; i < GRIDSIZE; i++) {
+            for (int j = 0; j < GRIDSIZE; j++) {
+                arena[i][j] = new Cell(config.startX + config.gap * i, config.startY + config.gap * j);
+            }
+        }
     }
 }

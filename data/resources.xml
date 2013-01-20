@@ -19,14 +19,14 @@
 	<image key="stone" 	file="walls/stone.png"/>
 	<image key="water" 	file="water/water.png"/>
 	<image key="lifepack" 	file="lifepacks/lifepack.png"/>
-	<image key="opponent_up" 	file="players/opponent_up.png"/>
-	<image key="opponent_down" 	file="players/opponent_down.png"/>
-	<image key="opponent_left" 	file="players/opponent_left.png"/>
-	<image key="opponent_right" 	file="players/opponent_right.png"/>
-	<image key="me_up" 	file="players/me_up.png"/>
-	<image key="me_down" 	file="players/me_down.png"/>
-	<image key="me_left" 	file="players/me_left.png"/>
-	<image key="me_right" 	file="players/me_right.png"/>
+	<image key="opponent_up" 	file="players/images/one/up.png"/>
+	<image key="opponent_down" 	file="players/images/one/down.png"/>
+	<image key="opponent_left" 	file="players/images/one/left.png"/>
+	<image key="opponent_right" 	file="players/images/one/right.png"/>
+	<image key="me_up" 	file="players/images/two/up.png"/>
+	<image key="me_down" 	file="players/images/two/down.png"/>
+	<image key="me_left" 	file="players/images/two/left.png"/>
+	<image key="me_right" 	file="players/images/two/right.png"/>
 	<image key="test" 	file="test/test.png"/>
 	
 	

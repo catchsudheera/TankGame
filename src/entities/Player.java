@@ -12,7 +12,6 @@ import org.newdawn.slick.SlickException;
  */
 public class Player extends Cell {
 
-    private boolean opponent;
     private Image playerImage;
     public static String PLAYERTYPE = "player";
     public int helth = 100;
@@ -23,22 +22,17 @@ public class Player extends Cell {
     private int points = 0;
     boolean isShot = false;
 
-    public Player(float x, float y, boolean opponent, int playerNo, int direction) {
-       
+    public Player(float x, float y, int playerNo, int direction) {
+
         super(x, y);
-        
-          
-        this.opponent = opponent;
+
         this.playerNo = playerNo;
         this.direction = direction;
         this.depth = 10;
-        this.opponent = opponent;
 
-        if (opponent) {
-            playerImage = ResourceManager.getImage("opponent_up");
-        } else {
-            playerImage = ResourceManager.getImage("me_up");
-        }
+
+        playerImage = ResourceManager.getImage("opponent_up");
+
         setGraphic(playerImage);
         setHitBox(0, 0, playerImage.getWidth(), playerImage.getHeight());
         addType(PLAYERTYPE);
@@ -48,6 +42,10 @@ public class Player extends Cell {
 
     public void deductCoins(int amount) {
         this.coins -= amount;
+    }
+
+    public int getPlayerNo() {
+        return playerNo;
     }
 
     public void addCoins(int amount) {
@@ -80,35 +78,19 @@ public class Player extends Cell {
     private void playerImageDirection(int direction) {
         switch (direction) {
             case 0:
-                if (opponent) {
-                    playerImage = ResourceManager.getImage("opponent_up");
-                } else {
-                    playerImage = ResourceManager.getImage("me_up");
-                }
+                playerImage = ResourceManager.getImage("opponent_up");
                 setGraphic(playerImage);
                 break;
             case 1:
-                if (opponent) {
-                    playerImage = ResourceManager.getImage("opponent_right");
-                } else {
-                    playerImage = ResourceManager.getImage("me_right");
-                }
+                playerImage = ResourceManager.getImage("opponent_right");
                 setGraphic(playerImage);
                 break;
             case 2:
-                if (opponent) {
-                    playerImage = ResourceManager.getImage("opponent_down");
-                } else {
-                    playerImage = ResourceManager.getImage("me_down");
-                }
+                playerImage = ResourceManager.getImage("opponent_down");
                 setGraphic(playerImage);
                 break;
             case 3:
-                if (opponent) {
-                    playerImage = ResourceManager.getImage("opponent_left");
-                } else {
-                    playerImage = ResourceManager.getImage("me_left");
-                }
+                playerImage = ResourceManager.getImage("opponent_left");
                 setGraphic(playerImage);
                 break;
         }
@@ -130,15 +112,14 @@ public class Player extends Cell {
         if (shot == 1) {
             isShot = true;
         }
-        //   helth = Integer.parseInt(data[4]);
-        //   coins = Integer.parseInt(data[5]);
-        //  points = Integer.parseInt(data[6]);
+        helth = Integer.parseInt(data[4]);
+        coins = Integer.parseInt(data[5]);
+        points = Integer.parseInt(data[6]);
     }
 
     private void collisionHandle() {
-        Coin collectedCoin = (Coin) collide(Coin.COIN, x, y);
-        if (collectedCoin != null) {
-            addCoins(collectedCoin.getValue());
-        }
+        String[] checkForCollisin = {Coin.COIN, LifePack.LIFE};
+        collide(checkForCollisin, x, y);
+
     }
 }

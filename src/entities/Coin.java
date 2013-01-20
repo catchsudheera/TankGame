@@ -66,7 +66,7 @@ public class Coin extends Cell {
     public void collisionResponse(Entity other) {
         
         ME.world.remove(this);
-        System.out.println("removed : "+(x-configuration.config.startX)/configuration.config.gap+","+(y-configuration.config.startX)/configuration.config.gap);
+//        System.out.println("removed : "+(x-configuration.config.startX)/configuration.config.gap+","+(y-configuration.config.startX)/configuration.config.gap);
         
         
     }
