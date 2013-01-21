@@ -23,7 +23,7 @@ class GameWorld extends World {
     private Image background, arenaImage;
     static public Cell[][] arena;
     private Communicator com;
-    private ArrayList<Player> players = new ArrayList<>();
+    private ArrayList<Entity> players = new ArrayList<>();
     private int AIplayerNo;
 
     public GameWorld(int id, GameContainer gc) {
@@ -209,39 +209,6 @@ class GameWorld extends World {
 
     }
 
-    private void setPlayer(String section) {
-        //System.out.println("section = "+section);
-
-        int x = -1, y = -1;
-        int playerNo = Integer.parseInt(section.charAt(1) + ""); //get player no from the String
-
-        if (playerNo == 0) { //top left
-            x = 0;
-            y = 0;
-        } else if (playerNo == 1) { //bottom left
-            x = 0;
-            y = GRIDSIZE - 1;
-        } else if (playerNo == 2) {//top right
-            x = GRIDSIZE - 1;
-            y = 0;
-        } else if (playerNo == 3) {//bottom right
-            x = GRIDSIZE - 1;
-            y = GRIDSIZE - 1;
-        } else if (playerNo == 4) {//middle
-            x = GRIDSIZE / 2;
-            y = GRIDSIZE / 2;
-        } else {
-            System.out.println("error setting player on the grid: in GAMEWORLD class");
-        }
-
-        // System.out.println(x + " " + y + "grid");
-        // System.out.println("-");
-        // new Player(arena[x][y].getPosX(), arena[x][y].getPosY(), false, playerNo, 0);
-        //System.out.println("+");
-        //   add(player);
-
-    }
-
     private void setPointsTable(Graphics g) {
 
         String spaceBetColumns = config.pointTableColumnSpacing;
@@ -256,7 +223,10 @@ class GameWorld extends World {
 
 
         for (int i = 0; i < players.size(); i++) {
-            String pointsTableEntry = players.get(i).getPointsTableEntry();
+            if (i == AIplayerNo) {
+                continue;
+            }
+            String pointsTableEntry = ((Player) players.get(i)).getPointsTableEntry();
             g.drawString(pointsTableEntry, textPositionX, textPositionY + spaceBetRows * (i + 1));
 
         }
@@ -275,7 +245,8 @@ class GameWorld extends World {
             x = Integer.parseInt(position[0]);
             y = Integer.parseInt(position[1]);
             direction = Integer.parseInt(data[2]);
-            Player newPlayer;
+
+            Entity newPlayer;
 
             if (no == AIplayerNo) {
                 newPlayer = new AIPlayer(arena[x][y].getPosX(), arena[x][y].getPosY(), no, direction);
@@ -292,16 +263,15 @@ class GameWorld extends World {
     private void updatePlayers(String[] section) {
 
         for (int i = 0; i < players.size(); i++) {
-            Player get = players.get(i);
-            int playerNo = get.getPlayerNo();
 
-            if (playerNo == AIplayerNo) {
+            if (i == AIplayerNo) {
                 //update the AI player code goes here
                 //not yet implemented
                 //continue;
-               AIPlayer AIget = (AIPlayer) players.get(i);
-               AIget.moveRight();
+                AIPlayer AIget = (AIPlayer) players.get(i);
+
             } else {
+                Player get = (Player) players.get(i);
                 get.setGlobleUpdate(section[i + 1]);
             }
         }

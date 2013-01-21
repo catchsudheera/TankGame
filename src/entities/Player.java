@@ -10,17 +10,20 @@ import org.newdawn.slick.SlickException;
  *
  * @author SUDHEERA
  */
+
 public class Player extends Cell {
 
     private Image playerImage;
     public static String PLAYERTYPE = "player";
-    public int helth = 100;
+    private int helth = 100;
     private int playerNo;
     private int direction = 0; // 0 North , 1 East , 2 South ,3 West 
     private String globleUpdate;
     private int coins = 0;
     private int points = 0;
-    boolean isShot = false;
+    private boolean isShot = false;
+
+  
 
     public Player(float x, float y, int playerNo, int direction) {
 
